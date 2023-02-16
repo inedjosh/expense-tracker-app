@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 class TransactionDiv extends StatelessWidget {
   final List<Transaction> transactions;
   final int index;
+  final Function(String) handleDelete;
 
-  TransactionDiv(this.transactions, this.index);
+  TransactionDiv(this.transactions, this.index, this.handleDelete);
 
   @override
   Widget build(BuildContext context) {
@@ -26,32 +27,12 @@ class TransactionDiv extends StatelessWidget {
             style: Theme.of(context).textTheme.headline6),
         subtitle: Text(DateFormat.yMMMMd().format(transactions[index].date),
             style: TextStyle(color: Colors.grey)),
+        trailing: IconButton(
+          icon: Icon(Icons.delete),
+          onPressed: () => handleDelete(transactions[index].id),
+          color: Theme.of(context).errorColor,
+        ),
       ),
     );
-
-    // Card(
-    //     child: Row(
-    //   children: [
-    //     Container(
-    //         width: 110,
-    //         margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-    //         decoration: BoxDecoration(
-    //             border: Border.all(color: Colors.purple, width: 1)),
-    //         padding: EdgeInsets.all(10),
-    //         child: Text('\$${transactions[index].amount.toStringAsFixed(1)}',
-    //             style: const TextStyle(
-    //                 fontWeight: FontWeight.bold,
-    //                 fontSize: 20,
-    //                 color: Colors.purple))),
-    //     Column(
-    //       mainAxisAlignment: MainAxisAlignment.start,
-    //       crossAxisAlignment: CrossAxisAlignment.start,
-    //       children: <Widget>[
-    //         Text(transactions[index].title,
-    //             style: Theme.of(context).textTheme.headline6),
-    //         Text(DateFormat.yMMMMd().format(transactions[index].date),
-    //             style: TextStyle(color: Colors.grey))
-    //       ],
-    //     )
   }
 }

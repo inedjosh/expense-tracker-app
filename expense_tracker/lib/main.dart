@@ -32,15 +32,21 @@ class _MainAppState extends State<MainApp> {
     }).toList();
   }
 
-  void _addNewTransaction(String title, double amount) {
+  void _addNewTransaction(String title, double amount, DateTime chosenDate) {
     final newTx = Transaction(
         title: title,
         id: DateTime.now().toString(),
         amount: amount,
-        date: DateTime.now());
+        date: chosenDate);
 
     setState(() {
       _transactions.add(newTx);
+    });
+  }
+
+  void _deleteTransaction(String id) {
+    setState(() {
+      _transactions.removeWhere((element) => element.id == id);
     });
   }
 
@@ -60,13 +66,13 @@ class _MainAppState extends State<MainApp> {
           fontFamily: 'QuickSand',
           textTheme: ThemeData.light().textTheme.copyWith(
               headline6: TextStyle(
-                  fontFamily: "OpenSans",
+                  fontFamily: "QuickSand",
                   fontSize: 18,
                   fontWeight: FontWeight.bold)),
           appBarTheme: AppBarTheme(
               textTheme: ThemeData.light().textTheme.copyWith(
                   headline6: TextStyle(
-                      fontFamily: 'OpenSans',
+                      fontFamily: 'QuickSand',
                       fontSize: 20,
                       fontWeight: FontWeight.bold)))),
       debugShowCheckedModeBanner: false,
@@ -74,12 +80,6 @@ class _MainAppState extends State<MainApp> {
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
             title: const Text('Expense tracker'),
-            actions: [
-              IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.add),
-              ),
-            ],
           ),
           body: SingleChildScrollView(
             child: Column(
@@ -87,7 +87,7 @@ class _MainAppState extends State<MainApp> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Chart(_recentTransactions),
-                TransactionList(_transactions)
+                TransactionList(_transactions, _deleteTransaction)
               ],
             ),
           ),

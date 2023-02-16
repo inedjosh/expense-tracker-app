@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class NewTransaction extends StatefulWidget {
-  final Function(String, double) handleSubmit;
+  final Function(String, double, DateTime) handleSubmit;
 
   NewTransaction(this.handleSubmit);
 
@@ -11,21 +12,40 @@ class NewTransaction extends StatefulWidget {
 
 class _NewTransactionState extends State<NewTransaction> {
   final titleController = TextEditingController();
-
   final amountController = TextEditingController();
+  dynamic _selectedDate;
 
-  void submitData() {
-    final enteredTitle = titleController.text;
-    final enteredAmount = double.parse(amountController.text);
-
-    if (enteredTitle.isEmpty || enteredAmount <= 0) {
-      Navigator.of(context).pop();
+  void _submitData() {
+    if (amountController.text == '') {
       return;
     }
 
-    widget.handleSubmit(enteredTitle, enteredAmount);
+    final _enteredTitle = titleController.text;
+    final _enteredAmount = double.parse(amountController.text);
+
+    if (_enteredTitle.isEmpty || _enteredAmount <= 0 || _selectedDate == null) {
+      return;
+    }
+
+    widget.handleSubmit(_enteredTitle, _enteredAmount, _selectedDate);
 
     Navigator.of(context).pop();
+  }
+
+  void _presentDatePicker() {
+    showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2023),
+            lastDate: DateTime.now())
+        .then((pickedDate) {
+      if (pickedDate == null) {
+        return;
+      }
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    });
   }
 
   @override
@@ -40,36 +60,47 @@ class _NewTransactionState extends State<NewTransaction> {
               children: [
                 TextField(
                   decoration: InputDecoration(labelText: 'Enter title'),
+                  style: TextStyle(fontFamily: 'QuickSand'),
                   controller: titleController,
                   keyboardType: TextInputType.name,
-                  onSubmitted: (_) => submitData(),
+                  onSubmitted: (_) => _submitData(),
                 ),
                 TextField(
                   decoration: InputDecoration(labelText: 'Enter amount'),
                   controller: amountController,
                   keyboardType: TextInputType.number,
-                  onSubmitted: (_) => submitData(),
+                  onSubmitted: (_) => _submitData(),
+                  style: TextStyle(fontFamily: 'QuickSand'),
                 ),
                 Container(
                   height: 90,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('No date chosen'),
+                      Text(
+                        _selectedDate == null
+                            ? 'No date chosen'
+                            : "Picked Date: ${DateFormat.yMd().format(_selectedDate)}",
+                        style: TextStyle(fontFamily: 'QuickSand'),
+                      ),
                       TextButton(
-                          onPressed: () {},
+                          onPressed: _presentDatePicker,
                           child: Text(
                             'Choose date',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'QuickSand'),
                           ))
                     ],
                   ),
                 ),
                 ElevatedButton(
-                    onPressed: submitData,
+                    onPressed: _submitData,
                     child: Text('Add Transaction',
                         style: TextStyle(
-                          color: Colors.white,
-                        )))
+                            color: Colors.white,
+                            fontFamily: 'QuickSand',
+                            fontSize: 18)))
               ],
             ),
           ),
