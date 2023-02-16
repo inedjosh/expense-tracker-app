@@ -1,22 +1,52 @@
 import 'package:expense_tracker/widgets/transaction_list.dart';
+import 'package:flutter/services.dart';
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 
 import './widgets/new_transaction.dart';
 import 'package:flutter/material.dart';
 import './models/transaction.dart';
 import './widgets/chart.dart';
 
-void main() {
-  runApp(MainApp());
-}
+// void main() {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   SystemChrome.setPreferredOrientations(
+//       [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
+//   runApp(MyApp());
+// }
 
-class MainApp extends StatefulWidget {
-  MainApp({super.key});
+void main() => runApp(MyApp());
 
+class MyApp extends StatelessWidget {
   @override
-  State<MainApp> createState() => _MainAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+          primarySwatch: Colors.purple,
+          fontFamily: 'QuickSand',
+          textTheme: ThemeData.light().textTheme.copyWith(
+              headline6: TextStyle(
+                  fontFamily: "QuickSand",
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold)),
+          appBarTheme: AppBarTheme(
+              textTheme: ThemeData.light().textTheme.copyWith(
+                  headline5: TextStyle(
+                      fontFamily: 'QuickSand',
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold)))),
+      home: MyHomePage(),
+    );
+  }
 }
 
-class _MainAppState extends State<MainApp> {
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
   // late String titleInput;
 
   final List<Transaction> _transactions = [
@@ -44,6 +74,8 @@ class _MainAppState extends State<MainApp> {
     });
   }
 
+  bool _showChart = false;
+
   void _deleteTransaction(String id) {
     setState(() {
       _transactions.removeWhere((element) => element.id == id);
@@ -60,45 +92,99 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-          primarySwatch: Colors.purple,
-          fontFamily: 'QuickSand',
-          textTheme: ThemeData.light().textTheme.copyWith(
-              headline6: TextStyle(
-                  fontFamily: "QuickSand",
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold)),
-          appBarTheme: AppBarTheme(
-              textTheme: ThemeData.light().textTheme.copyWith(
-                  headline6: TextStyle(
-                      fontFamily: 'QuickSand',
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold)))),
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-          resizeToAvoidBottomInset: false,
-          appBar: AppBar(
-            title: const Text('Expense tracker'),
-          ),
-          body: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Chart(_recentTransactions),
-                TransactionList(_transactions, _deleteTransaction)
+    final mediaQuery = MediaQuery.of(context);
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    final dynamic appBar = Platform.isIOS
+        ? CupertinoNavigationBar(
+            middle: const Text('Expense tracker'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                    onTap: () => _openNewTransactionModal(context),
+                    child: Icon(CupertinoIcons.add)),
               ],
             ),
-          ),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
-          floatingActionButton: Builder(
-            builder: (context) => FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: () => _openNewTransactionModal(context),
-            ),
-          )),
+          )
+        : AppBar(
+            title: const Text('Expense tracker'),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () => _openNewTransactionModal(context),
+              ),
+            ],
+          );
+    final trxListWidget = Container(
+        height: (mediaQuery.size.height -
+                appBar.preferredSize.height -
+                mediaQuery.padding.top) *
+            0.8,
+        child: TransactionList(_transactions, _deleteTransaction));
+    final pageBody = SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            if (isLandscape)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Show Chart',
+                    style: TextStyle(fontFamily: 'QuickSand'),
+                  ),
+                  Switch.adaptive(
+                      activeColor: Theme.of(context).accentColor,
+                      value: _showChart,
+                      onChanged: (val) {
+                        setState(() {
+                          _showChart = val;
+                        });
+                      })
+                ],
+              ),
+            if (!isLandscape)
+              Container(
+                  height: (mediaQuery.size.height -
+                          appBar.preferredSize.height -
+                          mediaQuery.padding.top) *
+                      0.2,
+                  child: Chart(_recentTransactions)),
+            if (!isLandscape) trxListWidget,
+            if (isLandscape)
+              _showChart
+                  ? Container(
+                      height: (mediaQuery.size.height -
+                              appBar.preferredSize.height -
+                              mediaQuery.padding.top) *
+                          0.2,
+                      child: Chart(_recentTransactions))
+                  : trxListWidget
+          ],
+        ),
+      ),
     );
+    return Platform.isIOS
+        ? CupertinoPageScaffold(
+            child: pageBody,
+            navigationBar: appBar,
+          )
+        : Scaffold(
+            resizeToAvoidBottomInset: false,
+            appBar: appBar,
+            body: pageBody,
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: Platform.isIOS
+                ? Container()
+                : Builder(
+                    builder: (context) => FloatingActionButton(
+                      child: Icon(Icons.add),
+                      onPressed: () => _openNewTransactionModal(context),
+                    ),
+                  ));
   }
 }
