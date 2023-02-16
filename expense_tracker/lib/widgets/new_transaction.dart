@@ -6,7 +6,7 @@ import 'dart:io';
 class NewTransaction extends StatefulWidget {
   final Function(String, double, DateTime) handleSubmit;
 
-  NewTransaction(this.handleSubmit);
+  const NewTransaction(this.handleSubmit, {super.key});
 
   @override
   State<NewTransaction> createState() => _NewTransactionState();
@@ -22,14 +22,14 @@ class _NewTransactionState extends State<NewTransaction> {
       return;
     }
 
-    final _enteredTitle = titleController.text;
-    final _enteredAmount = double.parse(amountController.text);
+    final enteredTitle = titleController.text;
+    final enteredAmount = double.parse(amountController.text);
 
-    if (_enteredTitle.isEmpty || _enteredAmount <= 0 || _selectedDate == null) {
+    if (enteredTitle.isEmpty || enteredAmount <= 0 || _selectedDate == null) {
       return;
     }
 
-    widget.handleSubmit(_enteredTitle, _enteredAmount, _selectedDate);
+    widget.handleSubmit(enteredTitle, enteredAmount, _selectedDate);
 
     Navigator.of(context).pop();
   }
@@ -66,20 +66,21 @@ class _NewTransactionState extends State<NewTransaction> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   TextField(
-                    decoration: InputDecoration(labelText: 'Enter title'),
-                    style: TextStyle(fontFamily: 'QuickSand'),
+                    decoration: const InputDecoration(labelText: 'Enter title'),
+                    style: const TextStyle(fontFamily: 'QuickSand'),
                     controller: titleController,
                     keyboardType: TextInputType.name,
                     onSubmitted: (_) => _submitData(),
                   ),
                   TextField(
-                    decoration: InputDecoration(labelText: 'Enter amount'),
+                    decoration:
+                        const InputDecoration(labelText: 'Enter amount'),
                     controller: amountController,
                     keyboardType: TextInputType.number,
                     onSubmitted: (_) => _submitData(),
-                    style: TextStyle(fontFamily: 'QuickSand'),
+                    style: const TextStyle(fontFamily: 'QuickSand'),
                   ),
-                  Container(
+                  SizedBox(
                     height: 90,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -88,11 +89,11 @@ class _NewTransactionState extends State<NewTransaction> {
                           _selectedDate == null
                               ? 'No date chosen'
                               : "Picked Date: ${DateFormat.yMd().format(_selectedDate)}",
-                          style: TextStyle(fontFamily: 'QuickSand'),
+                          style: const TextStyle(fontFamily: 'QuickSand'),
                         ),
                         TextButton(
                             onPressed: _presentDatePicker,
-                            child: Text(
+                            child: const Text(
                               'Choose date',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -103,15 +104,15 @@ class _NewTransactionState extends State<NewTransaction> {
                   ),
                   Platform.isIOS
                       ? CupertinoButton(
-                          child: Text('Add Transaction',
+                          onPressed: _submitData,
+                          child: const Text('Add Transaction',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontFamily: 'QuickSand',
-                                  fontSize: 18)),
-                          onPressed: _submitData)
+                                  fontSize: 18)))
                       : ElevatedButton(
                           onPressed: _submitData,
-                          child: Text('Add Transaction',
+                          child: const Text('Add Transaction',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontFamily: 'QuickSand',

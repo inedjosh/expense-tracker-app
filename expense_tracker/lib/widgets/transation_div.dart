@@ -7,40 +7,43 @@ class TransactionDiv extends StatelessWidget {
   final int index;
   final Function(String) handleDelete;
 
-  TransactionDiv(this.transactions, this.index, this.handleDelete);
+  const TransactionDiv(this.transactions, this.index, this.handleDelete,
+      {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(5),
+      margin: const EdgeInsets.all(5),
       elevation: 5,
       child: ListTile(
         leading: CircleAvatar(
           radius: 30,
           child: Padding(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               child: FittedBox(
                   child: Text(
                       '\$${transactions[index].amount.toStringAsFixed(1)}'))),
         ),
         title: Text(transactions[index].title,
-            style: Theme.of(context).textTheme.headline6),
+            style: Theme.of(context).textTheme.titleLarge),
         subtitle: Text(DateFormat.yMMMMd().format(transactions[index].date),
-            style: TextStyle(color: Colors.grey)),
+            style: const TextStyle(color: Colors.grey)),
         trailing: MediaQuery.of(context).size.width > 360
             ? TextButton.icon(
                 onPressed: () => handleDelete(transactions[index].id),
-                icon: Icon(Icons.delete, color: Theme.of(context).errorColor),
+                icon: Icon(Icons.delete,
+                    color: Theme.of(context).colorScheme.error),
                 label: Text(
                   'Delete',
                   style: TextStyle(
                       fontFamily: "QuickSand",
-                      color: Theme.of(context).errorColor),
+                      color: Theme.of(context).colorScheme.error),
                 ))
             : IconButton(
-                icon: Icon(Icons.delete, color: Theme.of(context).errorColor),
+                icon: Icon(Icons.delete,
+                    color: Theme.of(context).colorScheme.error),
                 onPressed: () => handleDelete(transactions[index].id),
-                color: Theme.of(context).errorColor,
+                color: Theme.of(context).colorScheme.error,
               ),
       ),
     );

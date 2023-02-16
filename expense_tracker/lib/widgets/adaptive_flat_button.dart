@@ -6,21 +6,21 @@ class AdaptiveFlatButton extends StatelessWidget {
   final String text;
   final VoidCallback _handler;
 
-  AdaptiveFlatButton(this.text, this._handler);
+  const AdaptiveFlatButton(this.text, this._handler, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Platform.isIOS
         ? CupertinoButton(
-            child: Text('Add Transaction',
+            onPressed: _handler,
+            child: const Text('Add Transaction',
                 style: TextStyle(
                     color: Colors.white,
                     fontFamily: 'QuickSand',
-                    fontSize: 18)),
-            onPressed: _handler)
+                    fontSize: 18)))
         : ElevatedButton(
             onPressed: _handler,
-            child: Text('Add Transaction',
+            child: const Text('Add Transaction',
                 style: TextStyle(
                     color: Colors.white,
                     fontFamily: 'QuickSand',

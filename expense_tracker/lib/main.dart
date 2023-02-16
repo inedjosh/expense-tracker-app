@@ -1,5 +1,4 @@
 import 'package:expense_tracker/widgets/transaction_list.dart';
-import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 
@@ -15,9 +14,11 @@ import './widgets/chart.dart';
 //   runApp(MyApp());
 // }
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,22 +27,35 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.purple,
           fontFamily: 'QuickSand',
           textTheme: ThemeData.light().textTheme.copyWith(
-              headline6: TextStyle(
+              titleLarge: const TextStyle(
                   fontFamily: "QuickSand",
                   fontSize: 18,
                   fontWeight: FontWeight.bold)),
           appBarTheme: AppBarTheme(
-              textTheme: ThemeData.light().textTheme.copyWith(
-                  headline5: TextStyle(
-                      fontFamily: 'QuickSand',
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold)))),
-      home: MyHomePage(),
+              toolbarTextStyle: ThemeData.light()
+                  .textTheme
+                  .copyWith(
+                      headlineSmall: const TextStyle(
+                          fontFamily: 'QuickSand',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold))
+                  .bodyMedium,
+              titleTextStyle: ThemeData.light()
+                  .textTheme
+                  .copyWith(
+                      headlineSmall: const TextStyle(
+                          fontFamily: 'QuickSand',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold))
+                  .titleLarge)),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -58,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<Transaction> get _recentTransactions {
     return _transactions.where((tx) {
-      return tx.date.isAfter(DateTime.now().subtract(Duration(days: 7)));
+      return tx.date.isAfter(DateTime.now().subtract(const Duration(days: 7)));
     }).toList();
   }
 
@@ -103,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 GestureDetector(
                     onTap: () => _openNewTransactionModal(context),
-                    child: Icon(CupertinoIcons.add)),
+                    child: const Icon(CupertinoIcons.add)),
               ],
             ),
           )
@@ -111,12 +125,12 @@ class _MyHomePageState extends State<MyHomePage> {
             title: const Text('Expense tracker'),
             actions: <Widget>[
               IconButton(
-                icon: Icon(Icons.add),
+                icon: const Icon(Icons.add),
                 onPressed: () => _openNewTransactionModal(context),
               ),
             ],
           );
-    final trxListWidget = Container(
+    final trxListWidget = SizedBox(
         height: (mediaQuery.size.height -
                 appBar.preferredSize.height -
                 mediaQuery.padding.top) *
@@ -132,12 +146,12 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     'Show Chart',
                     style: TextStyle(fontFamily: 'QuickSand'),
                   ),
                   Switch.adaptive(
-                      activeColor: Theme.of(context).accentColor,
+                      activeColor: Theme.of(context).colorScheme.secondary,
                       value: _showChart,
                       onChanged: (val) {
                         setState(() {
@@ -147,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             if (!isLandscape)
-              Container(
+              SizedBox(
                   height: (mediaQuery.size.height -
                           appBar.preferredSize.height -
                           mediaQuery.padding.top) *
@@ -156,7 +170,7 @@ class _MyHomePageState extends State<MyHomePage> {
             if (!isLandscape) trxListWidget,
             if (isLandscape)
               _showChart
-                  ? Container(
+                  ? SizedBox(
                       height: (mediaQuery.size.height -
                               appBar.preferredSize.height -
                               mediaQuery.padding.top) *
@@ -169,8 +183,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
     return Platform.isIOS
         ? CupertinoPageScaffold(
-            child: pageBody,
             navigationBar: appBar,
+            child: pageBody,
           )
         : Scaffold(
             resizeToAvoidBottomInset: false,
@@ -182,7 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ? Container()
                 : Builder(
                     builder: (context) => FloatingActionButton(
-                      child: Icon(Icons.add),
+                      child: const Icon(Icons.add),
                       onPressed: () => _openNewTransactionModal(context),
                     ),
                   ));
