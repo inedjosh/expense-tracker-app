@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
               toolbarTextStyle: ThemeData.light()
                   .textTheme
                   .copyWith(
-                      headlineSmall: const TextStyle(
+                      titleLarge: const TextStyle(
                           fontFamily: 'QuickSand',
                           fontSize: 20,
                           fontWeight: FontWeight.bold))
@@ -60,15 +60,8 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  // late String titleInput;
-
-  final List<Transaction> _transactions = [
-    // Transaction(
-    //     title: 'my new shoe', id: 't1', amount: 600.00, date: DateTime.now()),
-    // Transaction(
-    //     title: 'my new hair', id: 't2', amount: 7000.00, date: DateTime.now())
-  ];
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+  final List<Transaction> _transactions = [];
 
   List<Transaction> get _recentTransactions {
     return _transactions.where((tx) {
@@ -89,6 +82,25 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   bool _showChart = false;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print(state);
+
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   void _deleteTransaction(String id) {
     setState(() {
@@ -111,7 +123,14 @@ class _MyHomePageState extends State<MyHomePage> {
         MediaQuery.of(context).orientation == Orientation.landscape;
     final dynamic appBar = Platform.isIOS
         ? CupertinoNavigationBar(
-            middle: const Text('Expense tracker'),
+            middle: const Text(
+              'Expense tracker',
+              style: TextStyle(
+                fontSize: 20,
+                fontFamily: 'OpenSans',
+                color: Colors.white,
+              ),
+            ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -122,7 +141,14 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           )
         : AppBar(
-            title: const Text('Expense tracker'),
+            title: const Text(
+              'Expense tracker',
+              style: TextStyle(
+                fontSize: 20,
+                fontFamily: 'OpenSans',
+                color: Colors.white,
+              ),
+            ),
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.add),
